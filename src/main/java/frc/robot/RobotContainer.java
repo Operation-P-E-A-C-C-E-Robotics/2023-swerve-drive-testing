@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -22,13 +23,17 @@ public class RobotContainer {
     private final Joystick driver = new Joystick(0);
 
     /* Drive Controls */
-    private final int translationAxis = 1;
-    private final int strafeAxis = 0;
-    private final int rotationAxis = 2;
+    private final int translationAxis = 3;
+    private final int strafeAxis = 2;
+    private final int rotationAxis = 0;
 
     /* Driver Buttons */
     private final JoystickButton zeroGyro = new JoystickButton(driver, 2);
     private final JoystickButton robotCentric = new JoystickButton(driver, 1);
+
+    private final SlewRateLimiter translationRateLimiter = new SlewRateLimiter(Constants.Swerve.openLoopRamp);
+    private final SlewRateLimiter strafeRateLimiter = new SlewRateLimiter(Constants.Swerve.openLoopRamp);
+    
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -38,10 +43,10 @@ public class RobotContainer {
     public RobotContainer() {
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
-                s_Swerve, 
-                () -> -driver.getRawAxis(translationAxis), 
-                () -> -driver.getRawAxis(strafeAxis), 
-                () -> -driver.getRawAxis(rotationAxis), 
+                s_Swerve,
+                () -> -translationRateLimiter.calculate(driver.getRawAxis(translationAxis)), 
+                () -> -strafeRateLimiter.calculate(driver.getRawAxis(strafeAxis)), 
+                () -> -driver.getRawAxis(rotationAxis)*0.4, 
                 () -> robotCentric.getAsBoolean()
             )
         );
