@@ -1,14 +1,17 @@
 package frc.robot;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
-import frc.robot.autos.*;
+import frc.robot.autos.exampleAuto;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
@@ -31,8 +34,8 @@ public class RobotContainer {
     private final JoystickButton zeroGyro = new JoystickButton(driver, 2);
     private final JoystickButton robotCentric = new JoystickButton(driver, 1);
 
-    private final SlewRateLimiter translationRateLimiter = new SlewRateLimiter(Constants.Swerve.openLoopRamp);
-    private final SlewRateLimiter strafeRateLimiter = new SlewRateLimiter(Constants.Swerve.openLoopRamp);
+    // private final SlewRateLimiter translationRateLimiter = new SlewRateLimiter(Constants.Swerve.openLoopRamp);
+    // private final SlewRateLimiter strafeRateLimiter = new SlewRateLimiter(Constants.Swerve.openLoopRamp);
     
 
     /* Subsystems */
@@ -44,9 +47,9 @@ public class RobotContainer {
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve,
-                () -> -translationRateLimiter.calculate(driver.getRawAxis(translationAxis)), 
-                () -> -strafeRateLimiter.calculate(driver.getRawAxis(strafeAxis)), 
-                () -> -driver.getRawAxis(rotationAxis)*0.4, 
+                () -> -driver.getRawAxis(translationAxis), 
+                () -> -driver.getRawAxis(strafeAxis), 
+                () -> -driver.getRawAxis(rotationAxis), 
                 () -> robotCentric.getAsBoolean()
             )
         );
@@ -73,6 +76,6 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
-        return new exampleAuto(s_Swerve);
+        return new PathPlannerAuto("test1");
     }
 }
